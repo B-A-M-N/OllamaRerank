@@ -1,0 +1,30 @@
+{
+  "cache_id": "4eb702e8-c9aa-4b5c-8860-fdc60a30db81",
+  "timestamp": "2025-12-20T06:23:57.719891+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "export_sqlite_to_csv",
+    "signature": "def export_sqlite_to_csv(db_path, table_name, csv_path):",
+    "docstring": "Exports data from an SQLite table to a CSV file.",
+    "inputs": {
+      "db_path": "",
+      "table_name": "",
+      "csv_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "csv",
+      "pathlib",
+      "sqlite3",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/sqlite_to_csv.py",
+    "function": "export_sqlite_to_csv"
+  }
+}

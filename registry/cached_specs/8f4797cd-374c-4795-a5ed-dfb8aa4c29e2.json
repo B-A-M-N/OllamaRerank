@@ -1,0 +1,27 @@
+{
+  "cache_id": "8f4797cd-374c-4795-a5ed-dfb8aa4c29e2",
+  "timestamp": "2025-12-20T06:23:57.814706+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "validate_toml",
+    "signature": "def validate_toml(file_path):",
+    "docstring": "Validates the syntax of a TOML file.",
+    "inputs": {
+      "file_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys",
+      "toml"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/toml_validator.py",
+    "function": "validate_toml"
+  }
+}

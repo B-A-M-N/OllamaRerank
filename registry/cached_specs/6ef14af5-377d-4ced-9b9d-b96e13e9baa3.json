@@ -1,0 +1,27 @@
+{
+  "cache_id": "6ef14af5-377d-4ced-9b9d-b96e13e9baa3",
+  "timestamp": "2025-12-20T06:23:57.771783+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "validate_yaml",
+    "signature": "def validate_yaml(file_path):",
+    "docstring": "Validates the syntax of a YAML file.",
+    "inputs": {
+      "file_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys",
+      "yaml"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/yaml_validator.py",
+    "function": "validate_yaml"
+  }
+}

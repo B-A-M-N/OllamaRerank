@@ -1,0 +1,28 @@
+{
+  "cache_id": "3f519380-4592-49fe-89a7-2fdae6d9f940",
+  "timestamp": "2025-12-20T06:23:57.744400+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "split_csv_file",
+    "signature": "def split_csv_file(csv_file, num_rows):",
+    "docstring": "Splits a large CSV file into smaller files with a specified number of rows.",
+    "inputs": {
+      "csv_file": "",
+      "num_rows": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "pandas",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/csv_splitter.py",
+    "function": "split_csv_file"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "cache_id": "1adfc083-d92c-40db-b458-759b3ff05c30",
+  "timestamp": "2025-12-20T06:23:57.745141+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "generate_dummy_csv",
+    "signature": "def generate_dummy_csv(output_file, num_rows):",
+    "docstring": "Generates dummy CSV data (name, address, email) to a file.",
+    "inputs": {
+      "output_file": "",
+      "num_rows": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "csv",
+      "faker",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/generate_dummy_data.py",
+    "function": "generate_dummy_csv"
+  }
+}

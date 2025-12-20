@@ -1,0 +1,28 @@
+{
+  "cache_id": "efefa8ac-a5f8-492f-a22c-70ba0cfaae2c",
+  "timestamp": "2025-12-20T06:23:57.708588+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "merge_csv_files",
+    "signature": "def merge_csv_files(csv_files, output_file):",
+    "docstring": "Merges multiple CSV files with the same columns into a single CSV file.",
+    "inputs": {
+      "csv_files": "",
+      "output_file": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "pandas",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/csv_merger.py",
+    "function": "merge_csv_files"
+  }
+}

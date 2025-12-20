@@ -1,0 +1,29 @@
+{
+  "cache_id": "78085c2e-43c8-431b-964b-847cb54f2fe4",
+  "timestamp": "2025-12-20T06:23:57.781026+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "generate_call_graph",
+    "signature": "def generate_call_graph(script_path, output_file):",
+    "docstring": "Generates a call graph for a Python script.",
+    "inputs": {
+      "script_path": "",
+      "output_file": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "pycallgraph",
+      "subprocess",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/function_call_graph.py",
+    "function": "generate_call_graph"
+  }
+}

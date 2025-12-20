@@ -1,0 +1,33 @@
+{
+  "capability_profile": "no-network; scratch-only",
+  "created_at": "2025-12-19T02:12:12.139127",
+  "dependencies": {
+    "python": ">=3.10"
+  },
+  "model": "qwen2.5-coder:3b",
+  "security_policy": "bwrap-no-net",
+  "source_path": "/home/bamn/Machinist/artifacts/insert_newline.py",
+  "spec": {
+    "deterministic": true,
+    "docstring": "Ensures a string ends with a newline character.",
+    "failure_modes": [
+      {
+        "exception": "TypeError",
+        "reason": "The input is not a string."
+      }
+    ],
+    "imports": [],
+    "inputs": {
+      "text": "The input string."
+    },
+    "name": "insert_newline",
+    "outputs": {
+      "text": "The string, with a newline at the end."
+    },
+    "signature": "def insert_newline(text: str) -> str:"
+  },
+  "test_results_path": "/home/bamn/Machinist/artifacts/test_insert_newline.results.json",
+  "tests_path": "/home/bamn/Machinist/artifacts/test_insert_newline.py",
+  "tool_id": "ec544b2db5dae700087b89547b50e89a1d81b41e1be67c898a2be441c004949e",
+  "version": "0.1.0"
+}

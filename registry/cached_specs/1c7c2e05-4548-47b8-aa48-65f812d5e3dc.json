@@ -1,0 +1,31 @@
+{
+  "cache_id": "1c7c2e05-4548-47b8-aa48-65f812d5e3dc",
+  "timestamp": "2025-12-20T06:23:57.707931+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "bulk_rename",
+    "signature": "def bulk_rename(directory, pattern, new_prefix, new_ext, execute):",
+    "docstring": "Bulk renames files in a directory matching a pattern.",
+    "inputs": {
+      "directory": "",
+      "pattern": "",
+      "new_prefix": "",
+      "new_ext": "",
+      "execute": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "glob",
+      "os",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/bulk_rename.py",
+    "function": "bulk_rename"
+  }
+}

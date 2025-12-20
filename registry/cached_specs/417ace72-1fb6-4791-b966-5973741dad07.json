@@ -1,0 +1,32 @@
+{
+  "cache_id": "417ace72-1fb6-4791-b966-5973741dad07",
+  "timestamp": "2025-12-20T06:23:57.762964+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "video_to_gif",
+    "signature": "def video_to_gif(video_path, start_time, duration, output_path, fps, scale):",
+    "docstring": "Converts a segment of a video into an animated GIF.",
+    "inputs": {
+      "video_path": "",
+      "start_time": "",
+      "duration": "",
+      "output_path": "",
+      "fps": "",
+      "scale": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "subprocess",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/video_to_gif.py",
+    "function": "video_to_gif"
+  }
+}

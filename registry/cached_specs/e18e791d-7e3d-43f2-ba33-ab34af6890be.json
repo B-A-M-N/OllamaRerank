@@ -1,0 +1,28 @@
+{
+  "cache_id": "e18e791d-7e3d-43f2-ba33-ab34af6890be",
+  "timestamp": "2025-12-20T06:23:57.731271+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "check_markdown_links",
+    "signature": "def check_markdown_links(markdown_file_path):",
+    "docstring": "Checks for broken HTTP/HTTPS links in a Markdown file.",
+    "inputs": {
+      "markdown_file_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "re",
+      "requests",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/markdown_link_checker.py",
+    "function": "check_markdown_links"
+  }
+}

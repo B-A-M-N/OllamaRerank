@@ -1,0 +1,27 @@
+{
+  "cache_id": "096f2106-4c37-43b6-b1fd-afe66e879b6c",
+  "timestamp": "2025-12-20T06:23:57.774867+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "parse_time",
+    "signature": "def parse_time(time_str):",
+    "docstring": "Parses a time string like '1h30m10s' into seconds.",
+    "inputs": {
+      "time_str": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "re",
+      "sys",
+      "time"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/countdown_timer_flexible.py",
+    "function": "parse_time"
+  }
+}

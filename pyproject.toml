@@ -1,0 +1,22 @@
+[project]
+name = "machinist"
+version = "0.1.0"
+description = "LLM autotooling pipeline with sandboxed execution and tool registry"
+requires-python = ">=3.10"
+dependencies = [
+  "hypothesis>=6.98.0",
+  "pytest>=7.4.0",
+  "pydantic>=2.6.0",
+  "black>=24.3.0",
+  "regex>=2024.5.15",
+  "rich>=13.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.6.0",
+]
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"

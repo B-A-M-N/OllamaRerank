@@ -1,0 +1,22 @@
+{
+  "commands": {
+    "coverage": {
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.10.12, pytest-9.0.2, pluggy-1.6.0\nrootdir: /home/bamn/Machinist/artifacts\nplugins: hypothesis-6.148.7, cov-7.0.0\ncollected 1 item\n\ntest_move_file.py .                                                      [100%]\n\n================================ tests coverage ================================\n_______________ coverage: platform linux, python 3.10.12-final-0 _______________\n\nName           Stmts   Miss  Cover\n----------------------------------\nmove_file.py      13      4    69%\n----------------------------------\nTOTAL             13      4    69%\nRequired test coverage of 60% reached. Total coverage: 69.23%\n============================== 1 passed in 0.38s ===============================\n"
+    },
+    "lint": {
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    "tests": {
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ".                                                                        [100%]\n1 passed in 0.42s\n"
+    }
+  },
+  "coverage_ok": true,
+  "lint_ok": true,
+  "tests_ok": true
+}

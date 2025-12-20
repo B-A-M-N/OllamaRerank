@@ -1,0 +1,26 @@
+{
+  "cache_id": "686d47a6-06d9-4979-8b8a-74788f5463dc",
+  "timestamp": "2025-12-20T06:23:57.750355+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "check_git",
+    "signature": "def check_git():",
+    "docstring": "Checks if git is installed.",
+    "inputs": {},
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "collections",
+      "pathlib",
+      "subprocess",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/git_stats.py",
+    "function": "check_git"
+  }
+}

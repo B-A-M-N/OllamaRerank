@@ -1,0 +1,34 @@
+{
+  "cache_id": "213f34a6-b1d8-4f9c-b275-8552dea6de89",
+  "timestamp": "2025-12-20T06:23:57.798685+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "derive_key",
+    "signature": "def derive_key(password: bytes, salt: bytes) -> bytes:",
+    "docstring": "Derives a key from the password and salt using Scrypt.",
+    "inputs": {
+      "password": "",
+      "salt": ""
+    },
+    "outputs": {
+      "return_value": ""
+    },
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "base64",
+      "cryptography.fernet",
+      "cryptography.hazmat.backends",
+      "cryptography.hazmat.primitives.kdf.scrypt",
+      "os",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/encrypt_file.py",
+    "function": "derive_key"
+  }
+}

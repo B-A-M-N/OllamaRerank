@@ -1,0 +1,27 @@
+{
+  "cache_id": "60cd9c0a-7736-4144-a7d5-60921976a178",
+  "timestamp": "2025-12-20T06:23:57.827732+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "xor_encrypt_decrypt",
+    "signature": "def xor_encrypt_decrypt(text, key):",
+    "docstring": "Performs XOR encryption/decryption on text using a given key.",
+    "inputs": {
+      "text": "",
+      "key": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/text_encryptor.py",
+    "function": "xor_encrypt_decrypt"
+  }
+}

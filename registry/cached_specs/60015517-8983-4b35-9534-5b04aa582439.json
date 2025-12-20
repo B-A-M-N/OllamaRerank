@@ -1,0 +1,25 @@
+{
+  "cache_id": "60015517-8983-4b35-9534-5b04aa582439",
+  "timestamp": "2025-12-20T06:23:57.740016+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "check_ffmpeg",
+    "signature": "def check_ffmpeg():",
+    "docstring": "Checks if ffmpeg is installed.",
+    "inputs": {},
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "subprocess",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/youtube_to_mp3.py",
+    "function": "check_ffmpeg"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "cache_id": "0fe3aba3-42f5-4fea-a66b-651976434db7",
+  "timestamp": "2025-12-20T06:23:57.778065+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "remove_duplicate_lines",
+    "signature": "def remove_duplicate_lines(file_path, output_path=None):",
+    "docstring": "Removes duplicate lines from a text file, preserving order.",
+    "inputs": {
+      "file_path": "",
+      "output_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/remove_duplicates.py",
+    "function": "remove_duplicate_lines"
+  }
+}

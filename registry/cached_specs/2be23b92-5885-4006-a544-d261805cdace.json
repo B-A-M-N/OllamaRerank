@@ -1,0 +1,28 @@
+{
+  "cache_id": "2be23b92-5885-4006-a544-d261805cdace",
+  "timestamp": "2025-12-20T06:23:57.801109+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "find_large_functions",
+    "signature": "def find_large_functions(file_path, max_lines=50):",
+    "docstring": "Finds functions in a Python file that exceed a certain number of lines.",
+    "inputs": {
+      "file_path": "",
+      "max_lines": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "ast",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/find_large_functions.py",
+    "function": "find_large_functions"
+  }
+}

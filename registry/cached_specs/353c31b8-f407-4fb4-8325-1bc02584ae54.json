@@ -1,0 +1,29 @@
+{
+  "cache_id": "353c31b8-f407-4fb4-8325-1bc02584ae54",
+  "timestamp": "2025-12-20T06:23:57.749385+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "remove_comments",
+    "signature": "def remove_comments(file_path, output_path=None, language='python'):",
+    "docstring": "Removes comments from a source file.\nNote: This is a simple regex-based implementation and may not be perfect.",
+    "inputs": {
+      "file_path": "",
+      "output_path": "",
+      "language": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "re",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/comment_remover.py",
+    "function": "remove_comments"
+  }
+}

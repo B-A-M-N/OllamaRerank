@@ -1,0 +1,27 @@
+{
+  "cache_id": "abc853b5-2ee6-4a79-90a4-0fde0a8ceb96",
+  "timestamp": "2025-12-20T06:23:57.784008+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "dns_lookup",
+    "signature": "def dns_lookup(domain, record_types):",
+    "docstring": "Performs DNS lookups for a given domain and record types.",
+    "inputs": {
+      "domain": "",
+      "record_types": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "dns.resolver",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/dns_lookup.py",
+    "function": "dns_lookup"
+  }
+}

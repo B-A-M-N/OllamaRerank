@@ -1,0 +1,27 @@
+{
+  "cache_id": "0dfef3d6-d20f-425c-b5e9-0d0dc56bf219",
+  "timestamp": "2025-12-20T06:23:57.736371+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "remove_note",
+    "signature": "def remove_note(index):",
+    "docstring": "Removes a note by index.",
+    "inputs": {
+      "index": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "datetime",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/note_taker.py",
+    "function": "remove_note"
+  }
+}

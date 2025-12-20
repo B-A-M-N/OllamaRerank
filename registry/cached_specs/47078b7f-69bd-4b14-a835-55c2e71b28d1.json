@@ -1,0 +1,29 @@
+{
+  "cache_id": "47078b7f-69bd-4b14-a835-55c2e71b28d1",
+  "timestamp": "2025-12-20T06:23:57.846635+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "convert_json_to_yaml",
+    "signature": "def convert_json_to_yaml(json_file, yaml_file):",
+    "docstring": "Converts a JSON file to a YAML file.",
+    "inputs": {
+      "json_file": "",
+      "yaml_file": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "json",
+      "pathlib",
+      "sys",
+      "yaml"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/json_to_yaml.py",
+    "function": "convert_json_to_yaml"
+  }
+}

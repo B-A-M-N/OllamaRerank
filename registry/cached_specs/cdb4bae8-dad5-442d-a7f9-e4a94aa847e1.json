@@ -1,0 +1,27 @@
+{
+  "cache_id": "cdb4bae8-dad5-442d-a7f9-e4a94aa847e1",
+  "timestamp": "2025-12-20T06:23:57.847329+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "clipboard_tool",
+    "signature": "def clipboard_tool(copy_text=None, paste=False):",
+    "docstring": "Copies text to the clipboard or pastes text from the clipboard.",
+    "inputs": {
+      "copy_text": "",
+      "paste": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pyperclip",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/clipboard_tool.py",
+    "function": "clipboard_tool"
+  }
+}

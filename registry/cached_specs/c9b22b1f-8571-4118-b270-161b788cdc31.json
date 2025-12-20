@@ -1,0 +1,27 @@
+{
+  "cache_id": "c9b22b1f-8571-4118-b270-161b788cdc31",
+  "timestamp": "2025-12-20T06:23:57.725307+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "explore_ast",
+    "signature": "def explore_ast(file_path):",
+    "docstring": "Prints a readable representation of the Abstract Syntax Tree (AST) for a Python file.",
+    "inputs": {
+      "file_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "ast",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/ast_explorer.py",
+    "function": "explore_ast"
+  }
+}

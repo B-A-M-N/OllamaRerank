@@ -1,0 +1,29 @@
+{
+  "cache_id": "eaf9c3e3-1c0b-4106-8165-905ae8fe5d26",
+  "timestamp": "2025-12-20T06:23:57.818611+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "sample_large_file",
+    "signature": "def sample_large_file(file_path, num_lines, output_file):",
+    "docstring": "Takes a random sample of lines from a large file.\nThis method reads the file once to get the total line count, then\nrandomly selects line numbers to read on a second pass.",
+    "inputs": {
+      "file_path": "",
+      "num_lines": "",
+      "output_file": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "random",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/large_file_sampler.py",
+    "function": "sample_large_file"
+  }
+}

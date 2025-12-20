@@ -1,0 +1,28 @@
+{
+  "cache_id": "a771f4ee-dd20-41b6-8c1f-82caae1d90fd",
+  "timestamp": "2025-12-20T06:23:57.768904+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "to_grayscale",
+    "signature": "def to_grayscale(image_path, output_path):",
+    "docstring": "Converts an image to grayscale.",
+    "inputs": {
+      "image_path": "",
+      "output_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "PIL",
+      "argparse",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/grayscale_image.py",
+    "function": "to_grayscale"
+  }
+}

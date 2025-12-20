@@ -1,0 +1,27 @@
+{
+  "cache_id": "4323b555-b396-4cec-b7f7-14c4c6f785cd",
+  "timestamp": "2025-12-20T06:23:57.810845+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "generate_qr_code",
+    "signature": "def generate_qr_code(data, output_path):",
+    "docstring": "Generates a QR code from the given data and saves it to a file.",
+    "inputs": {
+      "data": "",
+      "output_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "qrcode",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/qr_code_generator.py",
+    "function": "generate_qr_code"
+  }
+}

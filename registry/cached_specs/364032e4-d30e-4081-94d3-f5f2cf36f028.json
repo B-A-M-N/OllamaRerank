@@ -1,0 +1,25 @@
+{
+  "cache_id": "364032e4-d30e-4081-94d3-f5f2cf36f028",
+  "timestamp": "2025-12-20T06:23:57.762171+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "check_ffmpeg",
+    "signature": "def check_ffmpeg():",
+    "docstring": "Checks if ffmpeg is installed.",
+    "inputs": {},
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "subprocess",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/video_to_gif.py",
+    "function": "check_ffmpeg"
+  }
+}

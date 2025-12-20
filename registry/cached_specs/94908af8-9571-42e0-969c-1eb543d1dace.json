@@ -1,0 +1,26 @@
+{
+  "cache_id": "94908af8-9571-42e0-969c-1eb543d1dace",
+  "timestamp": "2025-12-20T06:23:57.711278+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "add_todo",
+    "signature": "def add_todo(task):",
+    "docstring": "Adds a new todo.",
+    "inputs": {
+      "task": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/todo_list_cli.py",
+    "function": "add_todo"
+  }
+}

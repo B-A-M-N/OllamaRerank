@@ -1,0 +1,26 @@
+{
+  "cache_id": "b12c1c54-2bf2-4243-99e6-aa35618cac4e",
+  "timestamp": "2025-12-20T06:23:57.710588+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "save_todos",
+    "signature": "def save_todos(todos):",
+    "docstring": "Saves todos to the file.",
+    "inputs": {
+      "todos": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/todo_list_cli.py",
+    "function": "save_todos"
+  }
+}

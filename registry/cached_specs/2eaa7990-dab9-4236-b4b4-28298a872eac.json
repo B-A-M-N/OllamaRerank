@@ -1,0 +1,23 @@
+{
+  "cache_id": "2eaa7990-dab9-4236-b4b4-28298a872eac",
+  "timestamp": "2025-12-20T06:23:57.794751+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "get_quote",
+    "signature": "def get_quote():",
+    "docstring": "Fetches and displays a random quote.",
+    "inputs": {},
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "requests",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/quote_of_the_day.py",
+    "function": "get_quote"
+  }
+}

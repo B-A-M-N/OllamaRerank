@@ -1,0 +1,29 @@
+{
+  "cache_id": "d5b08333-5fdf-41ac-9b5e-5abb15e79a5b",
+  "timestamp": "2025-12-20T06:23:57.825300+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "generate_class_diagram",
+    "signature": "def generate_class_diagram(path, output_dir, output_format='png'):",
+    "docstring": "Generates a class diagram from a Python module or package.",
+    "inputs": {
+      "path": "",
+      "output_dir": "",
+      "output_format": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "subprocess",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/class_diagram_generator.py",
+    "function": "generate_class_diagram"
+  }
+}

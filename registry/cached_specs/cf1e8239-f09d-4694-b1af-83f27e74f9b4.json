@@ -1,0 +1,29 @@
+{
+  "cache_id": "cf1e8239-f09d-4694-b1af-83f27e74f9b4",
+  "timestamp": "2025-12-20T06:23:57.754882+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "scan_ports",
+    "signature": "def scan_ports(host, start_port, end_port):",
+    "docstring": "Scans a range of ports on a given host.",
+    "inputs": {
+      "host": "",
+      "start_port": "",
+      "end_port": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "datetime",
+      "socket",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/port_scanner_range.py",
+    "function": "scan_ports"
+  }
+}

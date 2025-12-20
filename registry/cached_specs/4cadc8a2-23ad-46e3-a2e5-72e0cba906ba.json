@@ -1,0 +1,28 @@
+{
+  "cache_id": "4cadc8a2-23ad-46e3-a2e5-72e0cba906ba",
+  "timestamp": "2025-12-20T06:23:57.815718+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "aws_s3_ls",
+    "signature": "def aws_s3_ls(bucket_name, prefix=None):",
+    "docstring": "Lists objects in an S3 bucket, optionally filtered by a prefix.",
+    "inputs": {
+      "bucket_name": "",
+      "prefix": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "boto3",
+      "botocore.exceptions",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/aws_s3_ls.py",
+    "function": "aws_s3_ls"
+  }
+}

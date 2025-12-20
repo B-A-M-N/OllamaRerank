@@ -1,0 +1,30 @@
+{
+  "cache_id": "8d69897f-465a-4adb-a0db-829f5fbc084e",
+  "timestamp": "2025-12-20T06:23:57.816941+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "print_json_tree",
+    "signature": "def print_json_tree(data, indent=0, is_last=True, prefix=''):",
+    "docstring": "Recursively prints JSON data in a tree-like structure.",
+    "inputs": {
+      "data": "",
+      "indent": "",
+      "is_last": "",
+      "prefix": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "json",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/json_to_tree.py",
+    "function": "print_json_tree"
+  }
+}

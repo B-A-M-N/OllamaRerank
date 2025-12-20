@@ -1,0 +1,25 @@
+{
+  "cache_id": "0e8cab58-33c3-41d9-8dd1-4efd3a623ad0",
+  "timestamp": "2025-12-20T06:23:57.742668+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "to_morse",
+    "signature": "def to_morse(text):",
+    "docstring": "Converts a string to Morse code.",
+    "inputs": {
+      "text": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/morse_code.py",
+    "function": "to_morse"
+  }
+}

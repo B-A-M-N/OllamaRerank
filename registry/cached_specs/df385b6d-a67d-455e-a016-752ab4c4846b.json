@@ -1,0 +1,29 @@
+{
+  "cache_id": "df385b6d-a67d-455e-a016-752ab4c4846b",
+  "timestamp": "2025-12-20T06:23:57.709344+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "rotate_image",
+    "signature": "def rotate_image(image_path, angle, output_path):",
+    "docstring": "Rotates an image by a given angle.",
+    "inputs": {
+      "image_path": "",
+      "angle": "",
+      "output_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "PIL",
+      "argparse",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/rotate_image.py",
+    "function": "rotate_image"
+  }
+}

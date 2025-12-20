@@ -1,0 +1,29 @@
+{
+  "cache_id": "323792ef-9344-47aa-8719-3e6d6954bfee",
+  "timestamp": "2025-12-20T06:23:57.809298+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "extract_from_json",
+    "signature": "def extract_from_json(file_path, jsonpath_expression):",
+    "docstring": "Extracts data from a JSON file using a JSONPath expression.",
+    "inputs": {
+      "file_path": "",
+      "jsonpath_expression": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "json",
+      "jsonpath_ng",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/json_path_extractor.py",
+    "function": "extract_from_json"
+  }
+}

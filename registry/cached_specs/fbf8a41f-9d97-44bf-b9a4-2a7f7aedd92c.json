@@ -1,0 +1,31 @@
+{
+  "cache_id": "fbf8a41f-9d97-44bf-b9a4-2a7f7aedd92c",
+  "timestamp": "2025-12-20T06:23:57.720847+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "view_avro_file",
+    "signature": "def view_avro_file(avro_file, show_schema=True, show_data=False, num_rows=10):",
+    "docstring": "Views the schema and optionally the data of an Avro file.",
+    "inputs": {
+      "avro_file": "",
+      "show_schema": "",
+      "show_data": "",
+      "num_rows": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "fastavro",
+      "json",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/avro_viewer.py",
+    "function": "view_avro_file"
+  }
+}

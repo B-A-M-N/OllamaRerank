@@ -1,0 +1,33 @@
+{
+  "cache_id": "95c1dd17-c16b-438f-8de3-d5dc1bca05bc",
+  "timestamp": "2025-12-20T06:23:57.785831+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "plot_csv_data",
+    "signature": "def plot_csv_data(csv_file, x_col, y_col, plot_type='line', title=None, output_file=None):",
+    "docstring": "Generates a simple plot from CSV data.",
+    "inputs": {
+      "csv_file": "",
+      "x_col": "",
+      "y_col": "",
+      "plot_type": "",
+      "title": "",
+      "output_file": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": true,
+    "imports": [
+      "argparse",
+      "matplotlib.pyplot",
+      "pandas",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/plot_csv_data.py",
+    "function": "plot_csv_data"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "cache_id": "aa283615-2317-458a-b6e6-a88909ebbe6c",
+  "timestamp": "2025-12-20T06:23:57.829018+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "word_frequency",
+    "signature": "def word_frequency(file_path, top_n=10):",
+    "docstring": "Counts word frequency in a text file.",
+    "inputs": {
+      "file_path": "",
+      "top_n": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "collections",
+      "pathlib",
+      "re",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/word_frequency.py",
+    "function": "word_frequency"
+  }
+}

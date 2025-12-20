@@ -1,0 +1,28 @@
+{
+  "cache_id": "81f562ae-8aea-4a7e-9bbb-9c798476d42e",
+  "timestamp": "2025-12-20T06:23:57.774054+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "find_duplicate_files",
+    "signature": "def find_duplicate_files(directory_path):",
+    "docstring": "Finds duplicate files in a directory based on their MD5 hash.",
+    "inputs": {
+      "directory_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "collections",
+      "hashlib",
+      "pathlib",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/find_duplicate_files.py",
+    "function": "find_duplicate_files"
+  }
+}

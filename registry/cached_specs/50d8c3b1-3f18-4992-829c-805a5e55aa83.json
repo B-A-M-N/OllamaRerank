@@ -1,0 +1,28 @@
+{
+  "cache_id": "50d8c3b1-3f18-4992-829c-805a5e55aa83",
+  "timestamp": "2025-12-20T06:23:57.791989+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "check_website_status_bulk",
+    "signature": "def check_website_status_bulk(file_path):",
+    "docstring": "Checks the HTTP status of a list of URLs from a file concurrently.",
+    "inputs": {
+      "file_path": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "concurrent.futures",
+      "pathlib",
+      "requests",
+      "sys"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/check_website_status_bulk.py",
+    "function": "check_website_status_bulk"
+  }
+}

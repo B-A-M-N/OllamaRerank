@@ -1,0 +1,29 @@
+{
+  "cache_id": "633e521f-9150-4739-a9e8-74a9c6a24363",
+  "timestamp": "2025-12-20T06:23:57.833502+00:00",
+  "spec_type": "ToolSpec",
+  "spec": {
+    "name": "format_xml",
+    "signature": "def format_xml(input_file, output_file=None):",
+    "docstring": "Pretty-formats an XML file.",
+    "inputs": {
+      "input_file": "",
+      "output_file": ""
+    },
+    "outputs": {},
+    "failure_modes": [],
+    "deterministic": false,
+    "imports": [
+      "argparse",
+      "pathlib",
+      "sys",
+      "xml.dom",
+      "xml.etree"
+    ]
+  },
+  "context": {
+    "source": "extractor",
+    "file": "/home/bamn/tools/xml_formatter.py",
+    "function": "format_xml"
+  }
+}
