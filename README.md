@@ -8,6 +8,11 @@ Precision-first reranking for embedding search. It takes your top-K candidates, 
 - **Ambiguity handling**: single-word/generic queries (e.g., “maintenance”) skip rerank and fall back to similarity.
 - **Explainable**: every result carries FACTS (domains, items, zero_reason, rerank_mode).
 
+- Please Note: I got this working utilizing a prompted model that can be downloaded here: https://ollama.com/B-A-M-N/qwen3-reranker-0.6b-fp16
+- FOR IDEAL PERFORMANCE IT IS RECOMMENDED TO USE THE SAME OR SIMILAR MODEL. Higher param models will no doubt, perform much better than a .6b model.
+
+  This was done primarily on a 12th gen i7 laptop, no gpu, and 16gb ram. 
+
 ## Quickstart
 ```bash
 python -m venv venv
