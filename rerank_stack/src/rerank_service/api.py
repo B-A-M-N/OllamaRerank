@@ -1,3 +1,5 @@
+import sys
+import sys
 from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
 from typing import List, Dict, Any, Optional
@@ -48,6 +50,7 @@ def _warn_public_bind():
             "Binding to all interfaces without auth/TLS is unsafe. "
             "Set RERANK_BIND_PUBLIC=1 to suppress this warning."
         )
+        sys.exit(1)
 
 _warn_public_bind()
 

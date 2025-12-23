@@ -1,15 +1,14 @@
 # OllamaRerank
 
-Precision-first reranking for embedding search. This stack takes your top‑K vector candidates, applies domain/item gates, scores what’s left with a lightweight reranker, and returns **FACTS** explaining every decision. The goal: fix “right domain, wrong object” mistakes (shower vs faucet, car vs bike) without adding heavy compute.
+Precision-first reranking for embedding search. This stack takes your top‑K vector candidates, applies domain/item gates, scores what’s left with a lightweight reranker, and returns **FACTS** explaining every decision. The goal: fix “right domain, wrong object” mistakes (shower vs faucet, car vs bike) without heavy compute.
 
 ## Why this exists
 Embedding retrieval is great at “nearby semantics,” but bad at **object identity**. Reranking fixes that:
-
 - **Correct object wins** (shower cartridge beats kitchen faucet).
 - **Wrong domain is rejected** (bicycle docs drop for car queries).
 - **Explainable output** (every score has a reason).
 
-## Value proposition (what it’s meant to do)
+## Value proposition
 - Fix “right domain, wrong object” errors without heavy compute.
 - Provide deterministic reasons for rejection (item/domain mismatch).
 - Keep retrieval fast while improving top‑1/top‑K relevance.
@@ -17,7 +16,7 @@ Embedding retrieval is great at “nearby semantics,” but bad at **object iden
 ## What it does
 - **Hard gates**: item/domain mismatches become score `0` with `zero_reason`.
 - **Coarse scoring**: small buckets (0/1/2/3) for usefulness.
-- **Deterministic ordering**: accepted docs first; rejects tiered by reason, then similarity.
+- **Deterministic ordering**: accepted docs first; rejects tiered by reason, then similarity (tie-of-ties stable).
 - **Ambiguity fallback**: vague/short queries skip the rerank API and fall back to similarity with lightweight intent‑aware heuristics.
 
 ## Quickstart
@@ -26,11 +25,23 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# start API (adjust module/path if needed)
+# start API (local-only safe default)
 PYTHONPATH=src uvicorn rerank_service.api:app --host 127.0.0.1 --port 8000 --reload
 
 # run bundled demos
 python scripts/run_demo_cases.py
+```
+
+## Eval
+```bash
+PYTHONPATH=src python rerank_demo/search.py --eval
+```
+See `docs/EVAL.md` to add your own queries.
+
+## Docker
+```bash
+docker compose up --build
+# API at http://127.0.0.1:8000 (binds local by default via RERANK_BIND_PUBLIC guard)
 ```
 
 ## How it works (pipeline)
@@ -38,7 +49,7 @@ python scripts/run_demo_cases.py
 2. **Ambiguity gate**: short/generic queries skip rerank.
 3. **Rerank**: `/api/rerank` scores candidates.
 4. **Gates**: item/domain mismatch ⇒ score 0 + `zero_reason`.
-5. **Sort**: positives first; rejects tiered, then similarity.
+5. **Sort**: positives first; rejects tiered, then similarity; stable tie-of-ties.
 6. **Explain**: FACTS show item/domain decisions and reasons.
 
 ## Rerank API (shape)
@@ -53,18 +64,12 @@ python scripts/run_demo_cases.py
   "policy_id": "howto_plumbing_v1"
 }
 ```
-Response includes `results` with `score` + optional `facts`.
-`/v1/rerank` is an OpenAI‑style convenience that accepts `documents: List[str]`.
+Response includes `results` with `score` + optional `facts`. `/v1/rerank` is an OpenAI‑style convenience that accepts `documents: List[str]`.
 
-## Model used (default)
+## Model (default)
 - Demo model: `B-A-M-N/qwen3-reranker-0.6b-fp16` (Ollama).
 - The server forwards `model` directly to Ollama `/api/generate`.
-- Swap models by changing `model` in the request or `RERANK_MODEL` in the environment.
-
-## Models
-- Demo uses Ollama model `B-A-M-N/qwen3-reranker-0.6b-fp16`.
-- The server forwards the `model` string to Ollama `/api/generate`.
-- You can swap to any reranker that outputs discrete scores; just keep the score contract and parser in sync.
+- Swap models by changing `model` in the request or `RERANK_MODEL` in the environment; keep the score contract in sync.
 
 ## Policies
 - Configs live in `configs/*.yaml`.
@@ -73,8 +78,6 @@ Response includes `results` with `score` + optional `facts`.
 
 ## Integrations (pattern)
 Retrieve → call `/api/rerank` → keep top‑K reranked docs as context.
-
-Minimal Python example:
 ```python
 import requests
 
@@ -105,18 +108,10 @@ python scripts/build_index.py \
 python scripts/run_demo_cases.py
 ```
 
-## Demo command (copy/paste)
-```bash
-python scripts/run_demo_cases.py
-```
+## Eval results (bundled sample)
+- Dataset: bundled demo (shower, car, bicycle, faucet, maintenance)
+- Metrics (Accuracy@1 / MRR): initial ≈ 0.60 / 0.80 → reranked = 1.00 / 1.00  
+Reproduce: `PYTHONPATH=src python rerank_demo/search.py --eval`
 
 ## Docs
-See `docs/USAGE.md` for:
-- full pipeline walkthrough
-- API schema details
-- model/backend notes
-- policy knobs and glossary
-- troubleshooting and recipes
-
-## License
-MIT (see `LICENSE`).
+See `docs/USAGE.md` for pipeline/API/ops, `docs/POLICY_SETUP.md` for policy tuning, `docs/EVAL.md` for eval, and `docs/INTEGRATIONS.md` for adapters.

@@ -221,21 +221,6 @@ Policy selection is automatic by query domain (e.g., `howto_plumbing_v1`), or ov
 
 ## Glossary (quick reference)
 
-* **FACTS**: per-document debug fields (item/domain decisions, zero_reason, etc.).
-* **Coarse buckets**: the discrete score set used by the reranker (0/1/2/3).
-* **Hard gates**: deterministic rejections (domain/item mismatch) that force score 0.
-* **Ambiguous trigger**: a query with no item/domain anchors that skips the LLM rerank step.
-* **Reject tiers**: ordered reasons for zero‑score docs (item_mismatch → no_item_found → domain_mismatch).
-
-* More recall on specific queries → allow same-domain/any-item to score 1 instead of 0.
-* Fewer skips → lower the ambiguity threshold (but expect noisier reranks).
-* New domain → add anchors + item aliases in a new policy YAML; PolicyManager picks it up.
-* Better tie handling → widen the score ladder or add more procedural boosts.
-
----
-
-## Glossary (quick reference)
-
 * **FACTS** — per-document debug fields (domains, items, zero_reason, rerank_mode) explaining why a score was assigned.
 * **Coarse buckets** — small discrete scores (currently 0/1/2/3) used for reranking.
 * **Hard gates** — deterministic rules that force score=0 for domain/item mismatches, regardless of model output.
@@ -293,6 +278,7 @@ PYTHONPATH=src uvicorn rerank_service.api:app --host 127.0.0.1 --port 8000
   `PYTHONPATH=src uvicorn rerank_service.api:app --host 127.0.0.1 --port 8000`
 - **LAN**: bind `0.0.0.0` but lock down with a firewall allowlist (e.g., `ufw allow from 192.168.1.0/24 to any port 8000`).
 - **Public**: do not expose directly; terminate TLS/auth/rate limits with your proxy/ingress (nginx/envoy/traefik/etc.). The service does not ship with edge hardening.
+- **Binding guard**: default `RERANK_BIND_PUBLIC=0` will refuse to start if host=0.0.0.0. Set `RERANK_BIND_PUBLIC=1` only if you know what you’re doing (and have TLS/auth/rate limits upstream).
 
 ### Production guardrails (recommended)
 - **Concurrency / timeouts**: limit tie-break concurrency and enforce per-call + total budgets with envs:  

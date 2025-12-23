@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  rerank_api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app/rerank_stack/src
+      - RERANK_BIND_PUBLIC=1
+      - RERANK_TIE_MAX_CONCURRENCY=4
+      - RERANK_TIE_TIMEOUT_SEC=30
+      - RERANK_TIE_TOTAL_TIMEOUT_SEC=60
+    restart: unless-stopped
