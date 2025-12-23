@@ -281,8 +281,29 @@ On startup, print the active model/backend/device. If it doesn’t, add a log. C
 **Ollama (local)**
 ```bash
 ollama pull B-A-M-N/qwen3-reranker-0.6b-fp16
+# Local-only (default safe)
 PYTHONPATH=src uvicorn rerank_service.api:app --host 127.0.0.1 --port 8000
+# LAN (firewall-restrict to your subnet)
+# PYTHONPATH=src uvicorn rerank_service.api:app --host 0.0.0.0 --port 8000
+# Public (not recommended without reverse proxy/auth/TLS): wrap behind nginx/envoy/ingress
 ```
+
+### Deployment modes (no bundled reverse proxy)
+- **Local default**: bind to `127.0.0.1` so it is not exposed.  
+  `PYTHONPATH=src uvicorn rerank_service.api:app --host 127.0.0.1 --port 8000`
+- **LAN**: bind `0.0.0.0` but lock down with a firewall allowlist (e.g., `ufw allow from 192.168.1.0/24 to any port 8000`).
+- **Public**: do not expose directly; terminate TLS/auth/rate limits with your proxy/ingress (nginx/envoy/traefik/etc.). The service does not ship with edge hardening.
+
+### Production guardrails (recommended)
+- **Concurrency / timeouts**: limit tie-break concurrency and enforce per-call + total budgets with envs:  
+  `RERANK_TIE_MAX_CONCURRENCY`, `RERANK_TIE_TIMEOUT_SEC`, `RERANK_TIE_TOTAL_TIMEOUT_SEC`.
+- **Caching**: enable in-memory tie cache (`RERANK_TIE_CACHE_TTL_SEC`) to avoid repeated tie-break hits on popular queries.
+- **Circuit breaker**: skip tie-break when failures spike; tune with `RERANK_TIE_CB_THRESHOLD`, `RERANK_TIE_CB_WINDOW_SEC`.
+- **Doc clipping**: cap tie prompt length with `RERANK_TIE_DOC_CHARS` to prevent huge prompts.
+- **Metrics logging**: set `RERANK_TIE_METRICS=1` to emit cache hits, timeouts, retries, fallbacks, circuit status.
+- **Ambiguity behavior**: `RERANK_SKIP_AMBIGUOUS=1` (default) avoids LLM rerank on vague queries; set to `0` to force rerank.
+- **Stable ordering**: sorting falls back to `original_corpus_index` so equal ties don’t shuffle.
+- **Security**: bind local by default; for external access, wrap with TLS/auth/rate limits via your proxy/ingress.
 
 **Swap in your own reranker**
 - Any model that can score (query, doc) pairs and emit a small discrete score is fine (bge-reranker, cross-encoders, etc.). Keep the response contract (score + optional facts).

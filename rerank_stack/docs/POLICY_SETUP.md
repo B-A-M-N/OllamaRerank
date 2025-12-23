@@ -40,3 +40,11 @@ This reranker is policy-driven. Each `policy_id` maps to a config in `rerank_sta
 3) Add `few_shot` pairs for core query types.
 4) Run `python rerank_stack/scripts/run_demo_cases.py --case <your_case>` with `PYTHONPATH=$PWD/rerank_stack/src` and inspect accept/reject reasons and tie values.
 5) If broad queries look off, adjust intent fit/boosts for OVERVIEW/INFO as above.
+
+## Ops / regression checklist
+- Timeouts/budgets: set `RERANK_TIE_TIMEOUT_SEC` and `RERANK_TIE_TOTAL_TIMEOUT_SEC`; keep `RERANK_TIE_MAX_CONCURRENCY` sane to avoid overload.
+- Cache: enable tie cache (`RERANK_TIE_CACHE_TTL_SEC`) so popular queries don’t hammer tie-break.
+- Circuit breaker: use `RERANK_TIE_CB_THRESHOLD` + `RERANK_TIE_CB_WINDOW_SEC` to skip tie-break when failures spike.
+- Metrics: `RERANK_TIE_METRICS=1` to log cache hits, timeouts, retries, fallbacks, circuit status.
+- Ambiguity: `RERANK_SKIP_AMBIGUOUS=1` to avoid LLM rerank for vague/short queries; set to `0` to force rerank.
+- Regression run: loop `run_demo_cases.py` 20x and grep for `parse_failed` or timeouts; capture server logs for any `percent_parse` errors.

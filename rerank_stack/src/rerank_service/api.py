@@ -29,6 +29,28 @@ from .scoring import score_documents_concurrently, fine_score_documents # Import
 from .parser import fallback_fine_score
 from .policies import load_policy
 
+# Safety: warn if binding to public while RERANK_BIND_PUBLIC=0 (default)
+def _warn_public_bind():
+    bind_public_env = os.getenv("RERANK_BIND_PUBLIC", "0").lower() not in {"0", "false", "no"}
+    bind_host = os.getenv("HOST", "")
+    uvicorn_host = os.getenv("UVICORN_HOST", "")
+    cli_host = ""
+    # Detect uvicorn CLI host from environment if set; otherwise rely on HOST/UVICORN_HOST
+    for var in ("UVICORN_HOST", "HOST"):
+        val = os.getenv(var)
+        if val:
+            cli_host = val
+            break
+    target_host = cli_host or bind_host or ""
+    if (target_host == "0.0.0.0") and not bind_public_env:
+        print(
+            "[SECURITY WARNING] RERANK_BIND_PUBLIC=0 and host=0.0.0.0. "
+            "Binding to all interfaces without auth/TLS is unsafe. "
+            "Set RERANK_BIND_PUBLIC=1 to suppress this warning."
+        )
+
+_warn_public_bind()
+
 app = FastAPI(
     title="Ollama Rerank API",
     description="A clean, first-class rerank API spec for Ollama.",
