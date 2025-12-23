@@ -25,17 +25,47 @@ def pick_cases(name: str | None) -> List[Tuple[str, str, Set[int], str]]:
     return matches
 
 
-async def run_case(name: str, query: str, relevant: Set[int], policy_id: str) -> None:
+async def run_case(
+    name: str,
+    query: str,
+    relevant: Set[int],
+    policy_id: str,
+    *,
+    show_facts: bool = False,
+    explain_rank: int | None = None,
+    show_debug: bool = False,
+) -> None:
     print(f"\n=== Demo: {name} ===")
     try:
-        await search_and_rerank(query, relevant_docs_indices=relevant, policy_id=policy_id)
+        await search_and_rerank(
+            query,
+            relevant_docs_indices=relevant,
+            policy_id=policy_id,
+            show_facts=show_facts,
+            explain_rank=explain_rank,
+            show_debug=show_debug,
+        )
     except Exception as exc:
         print(f"Demo '{name}' failed: {exc}")
 
 
-async def run_cases(cases: List[Tuple[str, str, Set[int], str]]) -> None:
+async def run_cases(
+    cases: List[Tuple[str, str, Set[int], str]],
+    *,
+    show_facts: bool = False,
+    explain_rank: int | None = None,
+    show_debug: bool = False,
+) -> None:
     for idx, (case_name, query, relevant, policy_id) in enumerate(cases):
-        await run_case(case_name, query, relevant, policy_id)
+        await run_case(
+            case_name,
+            query,
+            relevant,
+            policy_id,
+            show_facts=show_facts,
+            explain_rank=explain_rank,
+            show_debug=show_debug,
+        )
         if idx != len(cases) - 1:
             print("\nWaiting 5s before next demo…")
             await asyncio.sleep(5)
@@ -44,12 +74,23 @@ async def run_cases(cases: List[Tuple[str, str, Set[int], str]]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run rerank demo scenarios against the shared corpus.")
     parser.add_argument("--case", "-c", help="Name of the demo case to execute (default: all cases sequentially)")
+    parser.add_argument("--show-facts", action="store_true", help="Print full FACTS for every result")
+    parser.add_argument("--verbose", action="store_true", help="Alias for --show-facts")
+    parser.add_argument("--explain", type=int, help="Print FACTS for the given rank (1-based)")
+    parser.add_argument("--debug", action="store_true", help="Show debug sorting output")
     args = parser.parse_args()
     if args.case:
         cases = pick_cases(args.case)
     else:
         cases = DEMO_CASES
-    asyncio.run(run_cases(cases))
+    asyncio.run(
+        run_cases(
+            cases,
+            show_facts=args.show_facts or args.verbose,
+            explain_rank=args.explain,
+            show_debug=args.debug,
+        )
+    )
 
 
 if __name__ == "__main__":

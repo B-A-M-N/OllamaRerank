@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
 from typing import List, Dict, Any, Optional
 import time
 import random
 import traceback
+import os
+from pprint import pprint
 
 from .schemas import (
     RerankRequest,
@@ -22,9 +25,9 @@ from .schemas import (
 )
 from .truncate import truncate_text  # Import the truncation utility
 from .ollama_client import OllamaClient  # Import OllamaClient
-from .scoring import score_documents_concurrently # Import the renamed scoring function
-from .doc_quality import rerank_postprocess # Import the new post-processor
-from .policy import policy_manager, build_policy_context, PolicyContext # Re-introduce policy imports
+from .scoring import score_documents_concurrently, fine_score_documents # Import the renamed scoring function
+from .parser import fallback_fine_score
+from .policies import load_policy
 
 app = FastAPI(
     title="Ollama Rerank API",
@@ -40,22 +43,16 @@ ollama_client = OllamaClient()
 async def shutdown_event():
     await ollama_client.client.aclose()
 
+@app.exception_handler(Exception)
+async def all_exception_handler(request, exc):
+    tb = traceback.format_exc()
+    print(tb)
+    return JSONResponse(status_code=500, content={"error": "internal_error", "traceback": tb})
+
 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
-
-def clamp_bucket(score: int, facts: dict) -> int:
-    # Hard domain gate
-    if not facts.get("domain_match", False):
-        return 0
-
-    # Item identity gate: if query names an item and doc does NOT match it, clamp to lowest bucket (0)
-    if facts.get("query_item") is not None and not facts.get("same_item", False):
-        return 0
-
-    # same item: only 2 or 3 allowed
-    return 3 if score >= 3 else 2
 
 @app.post(
     "/api/rerank",
@@ -102,13 +99,13 @@ async def rerank_endpoint(request: RerankRequest):
     for request_index, doc_req_item in enumerate(request.documents):
         truncated_text = truncate_text(doc_req_item.text, truncate_opts.document_tokens)
         documents_for_scoring.append(
-            (request_index, doc_req_item.original_index, truncated_text, len(doc_req_item.text))
+            (request_index, doc_req_item.original_index, truncated_text, len(doc_req_item.text), doc_req_item.similarity)
         )
 
 
     # Update dummy token counts to reflect character length after truncation
     query_tokens = len(truncated_query)
-    document_tokens_list = [len(doc_text) for _, _, doc_text, _ in documents_for_scoring]
+    document_tokens_list = [len(doc_text) for _, _, doc_text, _, _ in documents_for_scoring]
     total_document_tokens = sum(document_tokens_list)
 
 
@@ -118,16 +115,15 @@ async def rerank_endpoint(request: RerankRequest):
     encode_ms = int((time.time() - start_encode_time) * 1000)
 
     start_score_time = time.time()
-    policy = policy_manager.select_policy(request.policy_id, request.query)
-    print(f"[RERANK_REQ] query={repr(request.query)} policy={policy.name} (default={policy_manager.default_policy_id})")
-    context = build_policy_context(policy)
+    # Policy selection (legacy/demo preserved via policy plugin)
+    policy_override = request.policy_id or os.environ.get("RERANK_POLICY_ID")
+    policy = load_policy(policy_override or "legacy_demo")
+    context = policy.build_context(request.query, policy_override)
+    print(f"[RERANK_REQ] query={repr(request.query)} policy={policy.policy_id()}")
     
     # Pre-compute identity facts for all documents once.
-    original_docs_map = {doc.original_index: doc.text for doc in request.documents}
-    facts_map = {
-        orig_idx: context.compute_identity_facts(query=request.query, doc=original_docs_map.get(orig_idx, ""))
-        for _, orig_idx, _, _ in documents_for_scoring
-    }
+    facts_map = policy.precompute_facts(request.query, request.documents)
+    print("FACTS_MAP_SAMPLE:", list(facts_map.items())[:2])
     
     # This now returns a tuple: (scored_documents, warnings)
     llm_scored_documents, warnings = await score_documents_concurrently(
@@ -147,71 +143,122 @@ async def rerank_endpoint(request: RerankRequest):
         print(f"DEBUG: MISSING documents from scoring response: {sorted(expected_indices - returned_indices)}")
     # -----------------------------------------
 
-    # --- Clamp scores based on FACTS ---
-    clamped_scored_documents = []
-    for req_idx, orig_idx, score, tie_breaker in llm_scored_documents:
-        facts = facts_map.get(orig_idx, {})
-        new_score = clamp_bucket(score, facts)
-        if new_score != score:
-            print(f"### ITEM_CLAMP_ACTIVE ### Query: {request.query}, Doc: {orig_idx}. Reason: FACTS based clamp. Score: {score} -> {new_score}")
-        clamped_scored_documents.append((req_idx, orig_idx, new_score, tie_breaker))
-    
-    llm_scored_documents = clamped_scored_documents
-    # --- End of clamp ---
+    similarities_by_req: List[Optional[float]] = [None] * len(request.documents)
+    for req_idx, _, _, _, sim in documents_for_scoring:
+        similarities_by_req[req_idx] = sim
 
-    # --- Post-process and apply quality heuristics ---
-    
-    # llm_scored_documents is a list of 4-element tuples from the successful scores
-    docs_for_postprocess = [original_docs_map[original_corpus_index] for _, original_corpus_index, _, _ in llm_scored_documents]
-    scores_for_postprocess = [score for _, _, score, _ in llm_scored_documents]
-    max_rank = max(1, len(llm_scored_documents) - 1)
-    original_similarities = [
-        1.0 - (req_idx / max_rank) for req_idx, _, _, _ in llm_scored_documents
-    ]
-    
-    postprocessed_results = rerank_postprocess(
+    debug = bool(request.options.debug) if request.options else False
+    ranked_results = policy.rank(
         query=request.query,
-        docs=docs_for_postprocess,
-        rerank_scores=scores_for_postprocess,
-        original_similarities=original_similarities,
-        context=context # Pass the context to rerank_postprocess
+        documents=request.documents,
+        scored_docs=llm_scored_documents,
+        similarities_by_req=similarities_by_req,
+        facts_map=facts_map,
+        debug=debug,
+        options=request.options or Options(),
     )
-    
-    # --- Final result construction ---
-    ranked_results: List[Result] = []
-    for relative_idx, final_score, _ in postprocessed_results:
-        # The `relative_idx` from postprocessing corresponds to the original request order
-        # of the documents *that were scored* (not including gate-skipped ones).
-        # We need to look up the original corpus index from our `llm_scored_documents` list.
-        _req_idx, original_corpus_index, _score, _tie_breaker = llm_scored_documents[relative_idx]
-
-        facts = facts_map.get(original_corpus_index, {}).copy() if facts_map.get(original_corpus_index) else {}
-        if final_score == 0:
-            if not facts.get("same_domain", False):
-                facts["zero_reason"] = "domain_mismatch"
-            elif not facts.get("doc_items"):
-                facts["zero_reason"] = "no_item_found"
-            elif facts.get("query_item") is not None and facts.get("same_item") is False:
-                facts["zero_reason"] = "item_mismatch"
-            else:
-                facts["zero_reason"] = "low_signal"
-
-        result = Result(
-            index=relative_idx, # The final rank position
-            original_corpus_index=original_corpus_index,
-            score=final_score,
-            facts=facts
+    for res in ranked_results[:2]:
+        print(
+            "FACTS_FOR_DOC",
+            res.original_corpus_index,
+            facts_map.get(res.original_corpus_index),
+            "result_facts",
+            res.facts,
         )
-        if request.return_documents:
-            result.document = original_docs_map.get(original_corpus_index)
-        ranked_results.append(result)
 
-    # Partition: keep positive scores ahead of zeros for clearer ordering.
-    positives = [r for r in ranked_results if (r.score or 0) > 0]
-    zeros = [r for r in ranked_results if (r.score or 0) <= 0]
-    ranked_results = positives + zeros
+    # Fine-grained tie-breaker: only for ACCEPT docs, top-K
+    TOP_K_FINE = int(os.getenv("RERANK_FINE_TOP_K", "10"))
+    doc_text_by_orig = {doc.original_index: doc.text for doc in request.documents}
+    sim_by_orig = {
+        doc.original_index: (float(doc.similarity) if doc.similarity is not None else 0.0)
+        for doc in request.documents
+    }
 
-    # Handle top_n
+    accept_candidates = [r for r in ranked_results if (r.decision or "").upper() == "ACCEPT"]
+    accept_for_fine = accept_candidates[:TOP_K_FINE] if TOP_K_FINE > 0 else []
+    fine_scores: Dict[int, Dict[str, Any]] = {}
+
+    if accept_for_fine:
+        fine_inputs = []
+        for res in accept_for_fine:
+            doc_text = doc_text_by_orig.get(res.original_corpus_index, "")
+            if doc_text:
+                fine_inputs.append((res.original_corpus_index, doc_text))
+        fine_scores = await fine_score_documents(
+            ollama_client=ollama_client,
+            model=request.model,
+            query=request.query,
+            docs=fine_inputs,
+        )
+
+    for res in ranked_results:
+        meta = fine_scores.get(res.original_corpus_index)
+        res.tie_breaker_model = request.model
+        res.tie_breaker_prompt_id = "percent_line_v1"
+        res.tie_breaker_used = False
+        res.tie_breaker_error = None
+        res.tie_breaker_latency_ms = None
+        res.fine_score = None
+        res.fine_score_norm = None
+        fallback_used = False
+        if meta:
+            res.tie_breaker_latency_ms = meta.get("latency_ms")
+            meta_error = meta.get("error")
+            if meta_error:
+                res.tie_breaker_error = meta_error
+            if meta.get("fine_score") is not None:
+                res.fine_score = meta["fine_score"]
+                res.fine_score_norm = meta.get("fine_score_norm")
+                res.tie_breaker_used = True
+            else:
+                # Deterministic fallback when tie-break fails
+                intent_fit = (res.facts or {}).get("intent_fit") if res.facts else None
+                sim_val = sim_by_orig.get(res.original_corpus_index, 0.0)
+                fallback_score = fallback_fine_score(intent_fit, sim_val)
+                res.fine_score = fallback_score
+                res.fine_score_norm = fallback_score / 100.0
+                fallback_used = True
+                res.tie_breaker_used = True
+                if meta_error:
+                    res.tie_breaker_error = f"{meta_error}|fallback"
+        if res.facts is None:
+            res.facts = {}
+        res.facts.update(
+            {
+                "fine_score": res.fine_score,
+                "fine_score_norm": res.fine_score_norm,
+                "tie_breaker_used": res.tie_breaker_used,
+                "tie_breaker_model": res.tie_breaker_model,
+                "tie_breaker_prompt_id": res.tie_breaker_prompt_id,
+                "tie_breaker_error": res.tie_breaker_error,
+                "tie_breaker_latency_ms": res.tie_breaker_latency_ms,
+                "tie_breaker_fallback": fallback_used,
+            }
+        )
+
+    # Final deterministic sort with tie-breaker fields
+    def _bucket(decision: Optional[str]) -> int:
+        if not decision:
+            return 0
+        d = decision.upper()
+        if d == "ACCEPT":
+            return 2
+        if d == "KEEP_LOW_SIGNAL":
+            return 1
+        return 0
+
+    ranked_results.sort(
+        key=lambda r: (
+            -_bucket(r.decision),
+            -(r.tier if r.tier is not None else -1),
+            -(r.fine_score if r.fine_score is not None else -1),
+            -(r.rank_score if r.rank_score is not None else (r.score or 0)),
+            -sim_by_orig.get(r.original_corpus_index, 0.0),
+            r.original_corpus_index,  # deterministic tie-of-ties
+            r.index,
+        )
+    )
+
     if request.top_n is not None and request.top_n > 0:
         ranked_results = ranked_results[: request.top_n]
 
@@ -231,7 +278,7 @@ async def rerank_endpoint(request: RerankRequest):
         total_ms=total_ms,
     )
 
-    return RerankResponse(
+    response_payload = RerankResponse(
         model=request.model,
         query=request.query,
         results=ranked_results,
@@ -239,6 +286,17 @@ async def rerank_endpoint(request: RerankRequest):
         timing=timing,
         warnings=warnings,
     )
+
+    # Belt-and-suspenders: ensure facts is always a dict for every result.
+    for res in response_payload.results:
+        if res.facts is None:
+            res.facts = {}
+
+    if debug:
+        print("DEBUG outgoing payload:")
+        pprint(response_payload.model_dump())
+
+    return response_payload
 
 
 @app.post(

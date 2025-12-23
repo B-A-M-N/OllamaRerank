@@ -255,7 +255,7 @@ def build_policy_context(policy: Policy) -> PolicyContext:
         boost_anchors=set(policy.boost_anchors),
         tier_a_keywords=set(policy.tier_a_keywords or policy.topic_anchors),
         tier_b_keywords=set(policy.tier_b_keywords),
-        intent_keywords=PROCEDURAL_INTENT_KEYWORDS,
+        intent_keywords=PROCEDURAL_INTENT_KEYWORDS | MAINTENANCE_INTENT_KEYWORDS,
         ambiguous_triggers=set(policy.ambiguous_triggers),
         ambiguous_max_score=policy.ambiguous_max_score,
         domain_keywords={str(k).lower() for k in policy.domain_keywords},

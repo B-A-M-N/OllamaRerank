@@ -22,6 +22,21 @@ You should see initial retrieval, reranked results (with FACTS), and eval metric
 
 ---
 
+## Model used
+
+The rerank API forwards your `model` string to Ollama `/api/generate`.
+
+Default demo model:
+- `B-A-M-N/qwen3-reranker-0.6b-fp16`
+
+To switch models:
+1) `ollama pull <model-name>`
+2) pass `model` in the API request or set `RERANK_MODEL` in the server environment.
+
+If you’re unsure which model is active, add a `/meta` endpoint or log the model name on server startup.
+
+---
+
 ## Pipeline (mental model)
 
 1) **Initial retrieval**: embedding similarity fetches top-K candidates.  
@@ -143,13 +158,22 @@ Policies live in `configs/*.yaml`:
 * **Ambiguous triggers**: terms that force fallback
 * **Few-shot**: optional examples per policy
 
-Policy selection is automatic by query domain (e.g., `howto_plumbing_v1`), or override with `policy_id`. `policy_id` maps directly to the filename in `configs/` (e.g., `howto_plumbing_v1` → `configs/howto_plumbing_v1.yaml`).
+Policy selection is automatic by query domain (e.g., `howto_plumbing_v1`), or override with `policy_id`.
+**Policy IDs map 1:1 to filenames in `configs/`** (e.g., `howto_plumbing_v1` → `configs/howto_plumbing_v1.yaml`).
 
 ---
 
 ## Adding your own data
 
 1) Put your corpus in `corpus.json` (list of texts).
+   Example `corpus.json`:
+   ```json
+   [
+     "Shower cartridge replacement: turn off water, remove handle, pull cartridge...",
+     "Bicycle chain maintenance: clean, lube, check stretch with gauge...",
+     "Spark plug replacement for a 2012 Civic: remove coil packs, torque to spec..."
+   ]
+   ```
 2) Build embeddings (`index.npz`) via `scripts/build_index.py`. Example:
    ```bash
    # assumes corpus.json exists in repo root
@@ -159,6 +183,10 @@ Policy selection is automatic by query domain (e.g., `howto_plumbing_v1`), or ov
      --output-index index.npz \
      --output-docs docs.json
    ```
+   Notes:
+   - `--corpus-file` should be a JSON list of strings (one doc per entry).
+   - `--output-index` is the vector index used by the demo retrieval.
+   - `--output-docs` is the aligned doc text file used by the demo runner.
    This writes `index.npz` + `docs.json` used by the demo/eval scripts.
 3) Add eval cases to `scripts/run_demo_cases.py` (`EVAL_SET`).
 4) Run `python scripts/run_demo_cases.py` and watch:
@@ -188,6 +216,16 @@ Policy selection is automatic by query domain (e.g., `howto_plumbing_v1`), or ov
 ---
 
 ## Recipe book (common tweaks)
+
+---
+
+## Glossary (quick reference)
+
+* **FACTS**: per-document debug fields (item/domain decisions, zero_reason, etc.).
+* **Coarse buckets**: the discrete score set used by the reranker (0/1/2/3).
+* **Hard gates**: deterministic rejections (domain/item mismatch) that force score 0.
+* **Ambiguous trigger**: a query with no item/domain anchors that skips the LLM rerank step.
+* **Reject tiers**: ordered reasons for zero‑score docs (item_mismatch → no_item_found → domain_mismatch).
 
 * More recall on specific queries → allow same-domain/any-item to score 1 instead of 0.
 * Fewer skips → lower the ambiguity threshold (but expect noisier reranks).

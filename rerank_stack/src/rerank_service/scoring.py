@@ -1,17 +1,33 @@
 from __future__ import annotations
 import asyncio
 import httpx
+import hashlib
+import os
 import re
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Any, Optional, Set
+import time
 
 from .ollama_client import OllamaClient
 from .policy import PolicyContext
 from .schemas import Options
-from .parser import parse_and_bucket
-from .prompt_builder import build_rerank_prompt_single_doc, build_retry_score_prompt
+from .parser import parse_and_bucket, parse_fine_score, fallback_fine_score
+from .prompt_builder import (
+    build_rerank_prompt_single_doc,
+    build_retry_score_prompt,
+    build_fine_score_prompt,
+)
 
-SEM = asyncio.Semaphore(1)
+_max_concurrency = int(os.getenv("RERANK_TIE_MAX_CONCURRENCY", "4"))
+SEM = asyncio.Semaphore(max(1, _max_concurrency))
+
+# Simple in-memory cache for tie-break outputs: key -> (expires_at, result_dict)
+_TIE_CACHE: Dict[str, Tuple[float, Dict[str, Any]]] = {}
+_TIE_CACHE_TTL = float(os.getenv("RERANK_TIE_CACHE_TTL_SEC", "300"))
+_CACHE_LOCK = asyncio.Lock()
+_TIE_FAILS: List[float] = []
+_CB_THRESHOLD = int(os.getenv("RERANK_TIE_CB_THRESHOLD", "5"))
+_CB_WINDOW_SEC = float(os.getenv("RERANK_TIE_CB_WINDOW_SEC", "60"))
 
 
 _STOPWORDS = {
@@ -181,7 +197,7 @@ async def score_documents_concurrently(
     ollama_client: OllamaClient,
     model: str,
     query: str,
-    documents: List[Tuple[int, int, str, int]],
+    documents: List[Tuple[int, int, str, int, Optional[float]]],
     options: Options,
     context: PolicyContext,
     facts_map: Dict[int, Dict[str, Any]],
@@ -203,7 +219,7 @@ async def score_documents_concurrently(
     if options and options.num_ctx is not None:
         generate_options["num_ctx"] = options.num_ctx
 
-    for request_index, original_corpus_index, doc_text, original_len in documents:
+    for request_index, original_corpus_index, doc_text, original_len, _sim in documents:
         procedural_strength = procedure_signal_count(doc_text)
         tier = _keyword_overlap_tier(query, doc_text, context)
         tie_breaker = tier * 100 + procedural_strength
@@ -337,3 +353,217 @@ async def _score_single_document_with_retry(
             "raw": raw if "raw" in locals() else None
         }
         return (request_index, original_corpus_index, 0, tie_breaker, warning)
+
+
+async def fine_score_documents(
+    ollama_client: OllamaClient,
+    model: str,
+    query: str,
+    docs: List[Tuple[int, str]],
+) -> Dict[int, Dict[str, Any]]:
+    """
+    Fine-grained scoring for already-accepted docs.
+    Returns mapping original_corpus_index -> {fine_score, fine_score_norm, error, latency_ms, raw}.
+    """
+    results: Dict[int, Dict[str, Any]] = {}
+    generate_options: Dict[str, Any] = {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "stream": False,  # rely on non-stream for easier parsing
+        "num_predict": 16,  # just enough for "<int>%"
+        "repeat_penalty": 1.05,
+        # no JSON format; prompt expects plain "<int>%"
+    }
+
+    cache_hits = 0
+    timeout_budget = float(os.getenv("RERANK_TIE_TIMEOUT_SEC", "30"))
+    total_budget = float(os.getenv("RERANK_TIE_TOTAL_TIMEOUT_SEC", "60"))
+    doc_clip_chars = int(os.getenv("RERANK_TIE_DOC_CHARS", "1600"))
+    metrics = {
+        "cache_hits": 0,
+        "requested": len(docs),
+        "cache_size": 0,
+        "ttl_sec": _TIE_CACHE_TTL,
+        "parse_errors": 0,
+        "retries": 0,
+        "retry_errors": 0,
+        "timeouts": 0,
+        "fallbacks": 0,
+        "skipped_budget": 0,
+        "circuit_open": 0,
+    }
+
+    # Track total budget start
+    total_started = time.perf_counter()
+
+    # Circuit breaker: if too many recent failures, skip tie-break for this request.
+    async with _CACHE_LOCK:
+        now = time.time()
+        recent_fails = [t for t in _TIE_FAILS if (now - t) <= _CB_WINDOW_SEC]
+        _TIE_FAILS[:] = recent_fails
+        cb_open = len(recent_fails) >= _CB_THRESHOLD
+
+    if cb_open:
+        metrics["circuit_open"] = 1
+        for orig_idx, _doc_text in docs:
+            results[orig_idx] = {
+                "fine_score": None,
+                "fine_score_norm": None,
+                "error": "circuit_open",
+                "latency_ms": 0,
+                "raw": None,
+            }
+        if os.getenv("RERANK_TIE_METRICS", "").lower() in {"1", "true", "yes"}:
+            print(
+                "[fine_score metrics]",
+                {
+                    **metrics,
+                    "cache_size": len(_TIE_CACHE),
+                },
+            )
+        return results
+
+    for orig_idx, doc_text in docs:
+        if (time.perf_counter() - total_started) > total_budget:
+            metrics["skipped_budget"] += 1
+            results[orig_idx] = {
+                "fine_score": None,
+                "fine_score_norm": None,
+                "error": "skipped_total_budget",
+                "latency_ms": 0,
+                "raw": None,
+            }
+            continue
+
+        doc_text = (doc_text or "")[:doc_clip_chars]
+        prompt = build_fine_score_prompt(query, doc_text)
+        prompt_hash = hashlib.sha1(prompt.encode("utf-8")).hexdigest()
+        doc_hash = hashlib.sha1((doc_text or "").encode("utf-8")).hexdigest()
+        query_hash = hashlib.sha1((query or "").encode("utf-8")).hexdigest()
+        cache_key = f"{model}:{prompt_hash}:{doc_hash}:{query_hash}"
+
+        # Cache lookup
+        async with _CACHE_LOCK:
+            cached = _TIE_CACHE.get(cache_key)
+            if cached and cached[0] > time.time():
+                cache_hits += 1
+                metrics["cache_hits"] += 1
+                results[orig_idx] = cached[1]
+                continue
+            elif cached:
+                _TIE_CACHE.pop(cache_key, None)
+
+        started = time.perf_counter()
+        raw: Optional[str] = None
+        raw_retry: Optional[str] = None
+        error: Optional[str] = None
+        fine_score: Optional[int] = None
+        try:
+            async with SEM:
+                raw = await asyncio.wait_for(
+                    ollama_client.generate(model, prompt, generate_options),
+                    timeout=timeout_budget,
+                )
+            if not str(raw or "").strip():
+                error = "empty_output"
+                print(
+                    "[fine_score empty_output]",
+                    {
+                        "orig_idx": orig_idx,
+                        "query": query[:80],
+                        "doc_head": doc_text[:120],
+                        "prompt_sha1": prompt_hash,
+                        "prompt_len": len(prompt),
+                        "prompt_head": prompt[:300],
+                        "options": generate_options,
+                    },
+                )
+            else:
+                fine_score, err = parse_fine_score(raw)
+                error = f"percent_parse:{err}" if fine_score is None and err else None
+                if error and ("percent_parse" in error):
+                    metrics["parse_errors"] += 1
+                    print(
+                        "[fine_score parse_error]",
+                        {
+                            "orig_idx": orig_idx,
+                            "prompt_sha1": prompt_hash,
+                            "prompt_head": prompt[:200],
+                            "raw_len": len(str(raw)),
+                            "raw_head": repr(str(raw)[:200]),
+                            "error": error,
+                            "options": generate_options,
+                            "parser": "percent_line",
+                        },
+                    )
+                    # Retry once with a minimal prompt to coerce a numeric answer
+                    retry_prompt = (
+                        "Return ONLY one integer 0-100 followed by a percent sign, like 70%.\n"
+                        "No explanations. One line. Output now:"
+                    )
+                    retry_options = {
+                        **generate_options,
+                        "num_predict": 12,
+                        "stop": ["\n"],
+                    }
+                    try:
+                        metrics["retries"] += 1
+                        async with SEM:
+                            raw_retry = await asyncio.wait_for(
+                                ollama_client.generate(model, retry_prompt, retry_options),
+                                timeout=timeout_budget / 2,
+                            )
+                        fine_score_retry, err_retry = parse_fine_score(raw_retry)
+                        if fine_score_retry is not None:
+                            fine_score = fine_score_retry
+                            error = None
+                        else:
+                            error = f"percent_retry_parse:{err_retry}"
+                            metrics["retry_errors"] += 1
+                            print(
+                                "[fine_score retry_parse_error]",
+                                {
+                                    "orig_idx": orig_idx,
+                                    "raw_retry_head": repr(str(raw_retry)[:200]),
+                                    "error": error,
+                                    "options": retry_options,
+                                    "parser": "percent_line_retry",
+                                },
+                            )
+                    except asyncio.TimeoutError:
+                        error = "percent_retry_timeout"
+                        metrics["timeouts"] += 1
+                    except Exception as exc_retry:
+                        error = f"percent_retry_exc:{exc_retry}"
+        except asyncio.TimeoutError:
+            error = "fine_score_timeout"
+            metrics["timeouts"] += 1
+        except Exception as exc:
+            error = f"fine_score_exc:{exc}"
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        result_payload = {
+            "fine_score": fine_score,
+            "fine_score_norm": (fine_score / 100.0) if fine_score is not None else None,
+            "error": error,
+            "latency_ms": latency_ms,
+            "raw": raw_retry or raw,
+        }
+        if error and ("fallback" in (error or "")):
+            metrics["fallbacks"] += 1
+        results[orig_idx] = result_payload
+        # cache set
+        async with _CACHE_LOCK:
+            _TIE_CACHE[cache_key] = (time.time() + _TIE_CACHE_TTL, result_payload)
+            if error:
+                _TIE_FAILS.append(time.time())
+
+    if os.getenv("RERANK_TIE_METRICS", "").lower() in {"1", "true", "yes"}:
+        print(
+            "[fine_score metrics]",
+            {
+                **metrics,
+                "cache_size": len(_TIE_CACHE),
+            },
+        )
+    return results

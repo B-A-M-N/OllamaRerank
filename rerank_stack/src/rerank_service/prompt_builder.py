@@ -85,3 +85,23 @@ def build_retry_score_prompt(
         f"FACTS: {_as_json(facts)}\n"
         "OUTPUT:"
     )
+
+
+def build_fine_score_prompt(query: str, document_text: str) -> str:
+    """
+    Ask the model for a continuous fine-grained score 0-100 for tie-breaking.
+    """
+    return (
+        "You are a reranking scorer. Score how well the DOCUMENT answers the QUERY.\n\n"
+        "Return EXACTLY one line:\n"
+        "<integer 0-100>%\n"
+        "Examples: 0%, 15%, 70%, 100%\n"
+        "No explanations. No labels. No extra text.\n\n"
+        "- 100 = directly answers with correct, actionable steps or precise info.\n"
+        "- 70  = relevant and helpful but partial, indirect, or missing key steps.\n"
+        "- 40  = somewhat related but not a good answer.\n"
+        "- 0   = not relevant.\n\n"
+        f"QUERY: {query}\n\n"
+        f"DOCUMENT: {document_text}\n\n"
+        "Output exactly: <int>%"
+    )
