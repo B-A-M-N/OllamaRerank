@@ -1,0 +1,6 @@
+INFO:     Will watch for changes in these directories: ['/home/bamn/OllamaRerank/rerank_stack']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [2658955] using StatReload
+INFO:     Started server process [2658957]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

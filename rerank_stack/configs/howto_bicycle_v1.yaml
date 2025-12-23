@@ -1,0 +1,113 @@
+name: howto_bicycle_v1
+scale: [0, 3, 7, 10]
+
+rubric: |
+  10 = actionable bicycle repair/maintenance instructions that directly satisfy the query.
+  7 = other bicycle-focused procedures or diagnostics (tires, chain, patching, brake adjustments).
+  3 = tangential bicycle or general maintenance topic.
+  0 = anything outside the cycling domain.
+
+object_groups:
+  bicycle:
+    - bicycle
+    - bike
+    - chain
+    - tire
+    - wheel
+    - derailleur
+    - brake
+    - handlebar
+    - tube
+    - rim
+    - pedal
+
+synonyms:
+  bicycle: ["bike", "bikes"]
+  chain: ["chains"]
+  tire: ["tires"]
+  wheel: ["wheels"]
+  brake: ["brakes"]
+  derailleur: ["derailleurs"]
+  handlebar: ["handlebars"]
+  tube: ["tubes", "inner tube", "inner tubes"]
+  rim: ["rims"]
+  pedal: ["pedals"]
+
+topic_anchors:
+  - bicycle
+  - bike
+  - chain
+  - tire
+  - wheel
+  - patch
+  - pump
+  - derailleur
+  - brake
+  - handlebar
+
+boost_anchors:
+  - bicycle
+  - bike
+  - chain
+  - tire
+  - wheel
+
+shower_context_anchors: []
+
+tier_a_keywords:
+  - bicycle
+  - bike
+  - chain
+  - tire
+  - pump
+  - derailleur
+
+tier_b_keywords:
+  - patch
+  - inflate
+  - adjust
+  - align
+  - tension
+  - true
+  - bleed
+  - index
+
+intent_keywords:
+  - repair
+  - fix
+  - lube
+  - adjust
+  - tighten
+  - inflate
+  - replace
+  - patch
+
+caps:
+  - name: non_bike_cap
+    if_query_contains_any: ["bicycle", "bike", "chain"]
+    and_doc_contains_any: ["car", "engine", "spark"]
+    cap_to: 0
+
+boosts:
+  - name: procedural_bike_boost
+    if_base_score_at_least: 7
+    and_doc_contains_any: ["lube", "tighten", "replace", "patch", "inflate"]
+    and_doc_contains_any2: ["chain", "tire", "wheel", "bike"]
+    boost_to: 10
+
+few_shot:
+  - query: "bicycle repair"
+    doc: "Clean, lube, and adjust the chain, then inflate the tires to spec."
+    score: 10
+  - query: "bicycle repair"
+    doc: "Patch holes in your tire and keep the derailleur tuned."
+    score: 7
+  - query: "bicycle repair"
+    doc: "Guide to choosing the right bicycle tires."
+    score: 7
+  - query: "bicycle repair"
+    doc: "A brief history of bicycles and how modern frames are manufactured."
+    score: 3
+  - query: "bicycle repair"
+    doc: "How to fix a leaky faucet in the kitchen."
+    score: 0

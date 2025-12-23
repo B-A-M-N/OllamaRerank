@@ -1,0 +1,264 @@
+{
+  "name": "howto_plumbing_v1",
+  "scale": [0, 3, 7, 10],
+  "rubric": "10 = explicit steps (2+ actions) that match the fixture.\n7 = diagnosis + next action, or partial steps that match the fixture.\n3 = vague mention / generic info, symptoms-only, or broad maintenance.\n0 = wrong domain/fixture.\n",
+  "domain_keywords": [
+    "plumbing",
+    "water",
+    "leak",
+    "drip",
+    "faucet",
+    "tap",
+    "shower",
+    "tub",
+    "bath",
+    "sink",
+    "valve",
+    "cartridge",
+    "stem",
+    "diverter",
+    "handle",
+    "spout",
+    "aerator",
+    "washer",
+    "o-ring",
+    "gasket",
+    "drain",
+    "trap",
+    "p-trap",
+    "pipe",
+    "supply",
+    "shutoff",
+    "heater",
+    "teflon",
+    "ptfe",
+    "thread",
+    "sealant",
+    "coil"
+  ],
+  "synonyms": {
+    "leak": ["drip", "dripping", "leaky", "leaking"],
+    "faucet": ["tap"],
+    "shower": ["showerhead", "shower head"],
+    "teflon": ["ptfe", "thread tape", "plumber's tape"],
+    "o-ring": ["oring", "o ring"],
+    "valve": ["cartridge"]
+  },
+  "topic_anchors": [
+    "plumbing",
+    "water",
+    "leak",
+    "dripping",
+    "faucet",
+    "tap",
+    "shower",
+    "showerhead",
+    "tub",
+    "bath",
+    "sink",
+    "cartridge",
+    "valve",
+    "stem",
+    "diverter",
+    "mixing",
+    "handle",
+    "spout",
+    "washer",
+    "o-ring",
+    "gasket",
+    "aerator",
+    "drain",
+    "trap",
+    "pipe",
+    "supply",
+    "shutoff",
+    "repair",
+    "fix",
+    "replace",
+    "tighten",
+    "reassemble",
+    "test"
+  ],
+  "boost_anchors": [
+    "shower",
+    "showerhead",
+    "tub",
+    "bath",
+    "faucet",
+    "valve",
+    "cartridge",
+    "diverter",
+    "handle",
+    "spout",
+    "washer",
+    "o-ring",
+    "aerator"
+  ],
+  "shower_context_anchors": [
+    "shower",
+    "showerhead",
+    "tub",
+    "bath",
+    "diverter",
+    "mixing"
+  ],
+  "tier_a_keywords": [
+    "leak",
+    "drip",
+    "shower",
+    "showerhead",
+    "tub",
+    "bath",
+    "faucet",
+    "sink",
+    "cartridge",
+    "valve",
+    "stem",
+    "diverter",
+    "handle",
+    "spout",
+    "washer",
+    "o-ring",
+    "aerator"
+  ],
+  "tier_b_keywords": [
+    "plumbing",
+    "water",
+    "pipe",
+    "supply",
+    "shutoff",
+    "drain",
+    "trap",
+    "fixture",
+    "bathroom",
+    "kitchen",
+    "sealant",
+    "teflon",
+    "ptfe"
+  ],
+  "intent_keywords": [
+    "fix",
+    "repair",
+    "replace",
+    "install",
+    "remove",
+    "tighten",
+    "loosen",
+    "unscrew",
+    "reassemble",
+    "wrap",
+    "seal",
+    "test",
+    "adjust",
+    "drain"
+  ],
+  "caps": [
+    {
+      "name": "hard_domain_mismatch_automotive",
+      "if_query_contains_any": ["shower", "tub", "bath", "faucet", "sink", "plumbing", "leak", "drip"],
+      "and_doc_contains_any": ["engine", "oil", "brake", "spark", "axle", "transmission"],
+      "cap_to": 0
+    },
+    {
+      "name": "hard_domain_mismatch_bicycle",
+      "if_query_contains_any": ["shower", "tub", "bath", "faucet", "sink", "plumbing", "leak", "drip"],
+      "and_doc_contains_any": ["bicycle", "bike", "chain", "derailleur", "tire"],
+      "cap_to": 0
+    },
+    {
+      "name": "diagnostic_not_steps_cap",
+      "if_query_contains_any": ["fix", "repair", "replace", "install"],
+      "and_doc_contains_any": ["might", "may", "symptoms", "diagnose", "diagnostic", "usually", "often", "likely"],
+      "and_doc_not_contains_any": ["turn off", "shut off", "remove", "pull", "install", "reassemble", "test"],
+      "cap_to": 7
+    },
+    {
+      "name": "shower_query_kitchen_sink_faucet_cap",
+      "if_query_contains_any": ["shower", "tub", "bath"],
+      "and_doc_contains_any": ["kitchen", "sink", "aerator"],
+      "and_doc_not_contains_any": ["shower", "tub", "bath", "diverter", "mixing"],
+      "cap_to": 0
+    },
+    {
+      "name": "faucet_query_shower_cap",
+      "if_query_contains_any": ["faucet", "tap", "sink", "aerator"],
+      "and_doc_contains_any": ["shower", "tub", "bath", "diverter", "cartridge"],
+      "and_doc_not_contains_any": ["faucet", "tap", "sink", "aerator"],
+      "cap_to": 0
+    }
+  ],
+  "boosts": [
+    {
+      "name": "procedural_boost",
+      "if_base_score_at_least": 7,
+      "and_doc_contains_any": [
+        "turn off",
+        "shut off",
+        "close",
+        "remove"
+      ],
+      "and_doc_contains_any2": [
+        "shower",
+        "showerhead",
+        "valve",
+        "cartridge",
+        "diverter",
+        "handle",
+        "faucet",
+        "washer",
+        "o-ring",
+        "aerator",
+        "pull",
+        "reassemble"
+      ],
+      "boost_to": 10
+    }
+  ],
+  "few_shot": [
+    {
+      "query": "how to fix a leaky shower",
+      "doc": "Turn off water. Remove handle. Pull cartridge. Install new cartridge. Reassemble. Turn water on and test.",
+      "score": 10
+    },
+    {
+      "query": "how to fix a leaky shower",
+      "doc": "If your shower is dripping, the cartridge might be worn; symptoms include temperature instability...",
+      "score": 7
+    },
+    {
+      "query": "how to fix a leaky shower",
+      "doc": "Replace the shower head washer, wrap the threads in teflon tape, and reattach.",
+      "score": 7
+    },
+    {
+      "query": "how to fix a leaky shower",
+      "doc": "Winterize the bathroom plumbing by draining pipes and disconnecting hoses.",
+      "score": 3
+    },
+    {
+      "query": "how to fix a leaky shower",
+      "doc": "Bicycle chain maintenance: clean, lube, check stretch with gauge...",
+      "score": 0
+    },
+    {
+      "query": "fix leaking faucet",
+      "doc": "How to fix a leaky faucet in the kitchen.",
+      "score": 3
+    },
+    {
+      "query": "fix leaking faucet",
+      "doc": "Shower cartridge replacement: turn off water, remove handle, pull cartridge, install new cartridge, reassemble, test.",
+      "score": 0
+    },
+    {
+      "query": "fix leaking faucet",
+      "doc": "If your shower is dripping, the cartridge might be worn; symptoms include temperature instability...",
+      "score": 0
+    },
+    {
+      "query": "fix leaking faucet",
+      "doc": "Turn off water. Remove faucet handle. Replace washer/o-ring or cartridge. Reassemble and test.",
+      "score": 10
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "model": "dengcao/qwen3-reranker-4b",
+  "query": "how to replace a shower cartridge",
+  "documents": [
+    {
+      "text": "Turn off the water supply. Remove handle...",
+      "original_index": 0
+    },
+    {
+      "text": "A shower cartridge controls temperature...",
+      "original_index": 1
+    },
+    {
+      "text": "Unrelated: how to fix a bicycle chain...",
+      "original_index": 2
+    }
+  ],
+  "top_n": 2,
+  "return_documents": true
+}

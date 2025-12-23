@@ -1,0 +1,85 @@
+name: generic_v1
+scale: [0, 3, 7, 10]
+
+rubric: |
+  10 = directly answers the query with actionable instructions.
+  7 = clearly relevant, domain-matched content even if it covers a subtopic.
+  3 = loosely related content that stays in the same broad domain.
+  0 = unrelated domains or off-topic material.
+
+domain_keywords:
+  - car
+  - automotive
+  - bike
+  - bicycle
+  - plumbing
+  - shower
+  - faucet
+  - heater
+
+synonyms:
+  fix: ["repair", "resolve", "address"]
+  leak: ["drip", "dripping"]
+  issue: ["problem", "trouble"]
+  maintenance: ["maintain", "maintaining"]
+
+topic_anchors:
+  - fix
+  - repair
+  - resolve
+  - maintenance
+  - issue
+  - helpful
+
+boost_anchors:
+  - fix
+  - repair
+  - resolve
+
+tier_a_keywords:
+  - fix
+  - repair
+  - maintenance
+  - issue
+
+tier_b_keywords:
+  - helpful
+  - general
+
+intent_keywords:
+  - fix
+  - repair
+  - replace
+  - maintain
+  - troubleshoot
+
+ambiguous_triggers:
+  - maintenance
+  - help
+  - issue
+  - problem
+ambiguous_max_score: 3
+
+caps: []
+boosts:
+  - name: procedural_generic_boost
+    if_base_score_at_least: 7
+    and_doc_contains_any: ["how to", "steps", "turn", "remove"]
+    and_doc_contains_any2: ["fix", "repair", "resolve"]
+    boost_to: 10
+few_shot:
+  - query: "how to fix a problem"
+    doc: "Step 1, analyze the problem; Step 2, implement a fix; Step 1, verify results."
+    score: 10
+  - query: "how to fix a problem"
+    doc: "Understanding why something is broken gives you confidence to repair it."
+    score: 7
+  - query: "how to fix a problem"
+    doc: "Here are unrelated instructions about a different topic."
+    score: 0
+  - query: "maintenance"
+    doc: "Maintaining your car's engine oil for optimal performance."
+    score: 7
+  - query: "maintenance"
+    doc: "Bicycle chain maintenance: clean, lube, check stretch with gauge..."
+    score: 7

@@ -1,0 +1,155 @@
+name: howto_automotive_v1
+scale: [0, 3, 7, 10]
+
+rubric: |
+  10 = covers the overall car maintenance query with actionable steps or diagnostics.
+  7 = addresses a common car maintenance subtask (oil change, brakes, spark plugs, filters, tires).
+  3 = mentions maintenance-adjacent topics (fluid checks, service scheduling) or drills into related systems.
+  0 = unrelated domains (plumbing, bicycle, shower, etc.).
+
+object_groups:
+  car:
+    - car
+    - automotive
+    - auto
+    - vehicle
+    - engine
+    - brake
+    - oil
+    - spark
+    - filter
+    - tire
+
+synonyms:
+  car: ["automotive", "auto", "vehicle", "cars", "vehicles"]
+  maintenance: ["maintain", "servicing", "service", "services"]
+  oil: ["engine oil", "motor oil"]
+  brake: ["brakes", "brake pad", "brake pads", "braking"]
+  spark: ["spark plug", "spark plugs"]
+  filter: ["filters", "air filter", "cabin filter"]
+
+topic_anchors:
+  - car
+  - automotive
+  - engine
+  - oil
+  - brake
+  - spark
+  - plug
+  - tire
+  - axle
+  - maintenance
+
+boost_anchors:
+  - engine
+  - oil
+  - brake
+  - spark
+
+shower_context_anchors: []
+
+tier_a_keywords:
+  - car
+  - automotive
+  - engine
+  - oil
+  - brake
+  - spark
+
+tier_b_keywords:
+  - maintenance
+  - service
+  - mechanic
+
+intent_keywords:
+  - change
+  - replace
+  - check
+  - tighten
+  - repair
+  - fix
+  - service
+  - maintenance
+  - maintain
+  - serviceable
+
+caps:
+  - name: hard_domain_mismatch_bicycle
+    if_query_contains_any: ["car", "automotive", "vehicle", "engine", "oil", "brake", "spark", "tire", "filter"]
+    and_doc_contains_any: ["bicycle", "bike", "derailleur", "chain"]
+    cap_to: 0
+
+  - name: hard_domain_mismatch_plumbing
+    if_query_contains_any: ["car", "automotive", "vehicle", "engine", "oil", "brake", "spark", "tire", "filter"]
+    and_doc_contains_any: ["faucet", "shower", "cartridge", "valve", "plumbing", "water heater", "pipe"]
+    cap_to: 0
+
+domain_keywords:
+  - car
+  - vehicle
+  - automotive
+  - auto
+  - engine
+  - oil
+  - filter
+  - brake
+  - brake fluid
+  - tire
+  - rotation
+  - alignment
+  - pressure
+  - coolant
+  - radiator
+  - transmission
+  - battery
+  - alternator
+  - spark
+  - plug
+  - obd
+  - mileage
+  - service
+  - belt
+  - hose
+  - torque
+  - socket
+  - ratchet
+  - fluid
+  - tires
+  - filter
+  - brake fluid
+  - spark plugs
+  - coil pack
+  - torque spec
+
+boosts:
+  - name: procedural_automotive_boost
+    if_base_score_at_least: 7
+    and_doc_contains_any: ["change", "replace", "check", "inspect", "tighten", "rotate", "align", "flush", "bleed"]
+    and_doc_contains_any2: ["engine", "oil", "filter", "brake", "spark", "tire", "coolant", "battery", "transmission", "obd", "fluid", "service", "belt", "hose"]
+    boost_to: 10
+
+few_shot:
+  - query: "car maintenance"
+    doc: "Change the engine oil, replace the oil filter, and check the brake pads."
+    score: 10
+  - query: "car maintenance"
+    doc: "Symptoms of a failing water heater and how to troubleshoot."
+    score: 0
+  - query: "car maintenance"
+    doc: "Regular oil changes keep your engine healthy."
+    score: 7
+  - query: "car maintenance"
+    doc: "How to fix a leaky shower faucet in the kitchen."
+    score: 0
+  - query: "car maintenance"
+    doc: "Understanding different types of automotive brakes gives you better stopping power."
+    score: 7
+  - query: "car maintenance"
+    doc: "Replace the spark plugs, gap them correctly, and torque them to spec."
+    score: 7
+  - query: "car maintenance"
+    doc: "Bicycle chain maintenance: clean, lube, check stretch with gauge..."
+    score: 0
+  - query: "car maintenance"
+    doc: "Cars need regular care; follow your owner's manual and keep service records."
+    score: 3
